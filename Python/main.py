@@ -179,5 +179,7 @@ class Menu:
             except Exception as e:
                 print(e)
 
+        self.graph.write_graph_to_text_file("result.txt")
+        
 menu = Menu()
 menu.main()
