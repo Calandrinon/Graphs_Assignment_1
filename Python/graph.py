@@ -1,11 +1,12 @@
 import copy
+import random
 
 """
     The graph is represented with two dictionaries, dictIn and dictOut for
     the inbound and outbound edges connected to each vertex.
     The keys of the dictionary are the vertices.
 
-    dictCosts is a dictionary with the keys being edges and the values being 
+    dictCosts is a dictionary with the keys being edges and the values being
     the costs of the edges.
 
     Name: Şut George
@@ -22,6 +23,16 @@ class DoubleDictGraph:
         for i in range(number_of_nodes):
             self._dictOut[i] = []
             self._dictIn[i] = []
+
+    """
+    def get_dict_out(self):
+        return self._dictOut
+
+
+    def get_dict_in(self):
+        return self._dictIn
+
+    """
 
 
     def get_vertices(self):
@@ -139,7 +150,7 @@ class DoubleDictGraph:
 
     def parse_inbound_edges_of_vertex_x(self, vertex_x):
         """
-            Returns a list with all the inbound edges startpoints which end 
+            Returns a list with all the inbound edges startpoints which end
             in the vertex x.
         """
         iterator = self.get_iterator_for_inbound_edges_of_vertex_x(vertex_x)
@@ -163,7 +174,7 @@ class DoubleDictGraph:
 
     def modify_edge_cost(self, vertex_x, vertex_y, new_cost):
         """
-            Modifies the cost of an edge which is stored in the 
+            Modifies the cost of an edge which is stored in the
             dictCosts dictionary of edges.
         """
         self._dictCosts[(vertex_x, vertex_y)] = new_cost
@@ -173,6 +184,11 @@ class DoubleDictGraph:
         """
             Adds a vertex to the graph.
         """
+
+        if vertex_x in self.get_vertices():
+            print("The vertex already exists!\n")
+            return
+
         self._dictOut[vertex_x] = []
         self._dictIn[vertex_x] = []
 
@@ -214,29 +230,77 @@ class DoubleDictGraph:
 
     @staticmethod
     def read_graph_from_text_file(filename):
-        """ 
-            A static method which reads from a file a graph, 
+        """
+            A static method which reads from a file a graph,
             creates it and returns it.
         """
-        ###  NOT IMPLEMENTED YET
+        f = open(filename, "r");
+        lines = f.readlines();
 
-       
-    @staticmethod
-    def write_graph_to_text_file(graph, file_name):
+        number_of_nodes = int(lines[0].split()[0])
+        number_of_edges = int(lines[0].split()[1])
+
+        graph = DoubleDictGraph(number_of_nodes)
+        index = 0 
+
+        for line_index in range(1, len(lines)):
+            split_line = lines[line_index].strip().split()
+            first_node = int(split_line[0])
+            second_node = int(split_line[1])
+            cost = int(split_line[2])
+            graph.add_edge(first_node, second_node, cost)
+
+        return graph
+
+
+    def write_graph_to_text_file(self, file_name):
         """
-            A static method which writes to a text file the graph given
-            as a parameter.
+            A method which writes to a text file the graph on which
+            it is applied.
         """
-        ### NOT IMPLEMENTED YET
+        number_of_nodes = self.get_number_of_vertices()
+        number_of_edges = 0
+
+        for node in self.get_vertices():
+            number_of_edges += len(self._dictOut[node]) 
+
+        f = open(file_name, "w")
+
+        f.write(str(number_of_nodes))
+        f.write(" ")
+        f.write(str(number_of_edges))
+        f.write("\n")
+
+        for node in range(0, self.get_number_of_vertices()):
+            for neighbour_of_node in self._dictOut[node]:
+                f.write(str(node))
+                f.write(" ")
+                f.write(str(neighbour_of_node))
+                f.write(" ")
+                f.write(str(self._dictCosts[(node, neighbour_of_node)]))
+                f.write("\n")
+        
 
 
     @staticmethod
     def create_random_graph(number_of_vertices, number_of_edges):
         """
-            Creates a random graph with a certain number of vertices and 
+            Creates a random graph with a certain number of vertices and
             edges and returns it
         """
-        ### NOT IMPLEMENTED YET
+
+        graph = DoubleDictGraph(number_of_vertices) 
+        
+        for edge in range(0, number_of_edges):
+            first_node = random.randrange(0, number_of_vertices)
+            second_node = random.randrange(0, number_of_vertices)  
+
+            while graph.is_edge(first_node, second_node):       
+                first_node = random.randrange(0, number_of_vertices)
+                second_node = random.randrange(0, number_of_vertices)  
+            
+            cost = random.randrange(-3, 9)
+            graph.add_edge(first_node, second_node, cost)
 
 
-    
+        return graph

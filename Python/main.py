@@ -1,214 +1,183 @@
+from tests import Tests
 from graph import DoubleDictGraph
 
-"""
-    TODO:
-    - The graph shall be modifiable: it shall be possible to add and remove an edge,
-    and to add and remove a vertex. Think about what should happen with the properties
-    of existing edges and with the identification of remaining vertices. You may use
-    an abstract Vertex_id instead of an int in order to identify vertices; in this case,
-    provide a way of iterating the vertices of the graph.
+#Tests()
 
-    - The graph shall be copyable, that is, it should be possible to make an exact
-    copy of a graph, so that the original can be then modified independently of its
-    copy. Think about the desirable behaviour of an Edge_property attached to the
-    original graph, when a copy is made.
+class Menu:
 
-    - Read the graph from a text file (as an external function); see the format below.
-
-    - Write the graph from a text file (as an external function); see the format below.
-
-    - Create a random graph with specified number of vertices and of edges
-    (as an external function).
-"""
-
-def test_get_vertices():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 0, 1)
-    graph.add_edge(0, 1, 7)
-    graph.add_edge(1, 2, 2)
-    graph.add_edge(2, 1, -1)
-    graph.add_edge(1, 3, 8)
-    graph.add_edge(2, 3, 5)
-
-    dict = {}
-    for i in range(30):
-        dict[i] = []
-    dict[0] = [0, 1]
-    dict[1] = [2, 3]
-    dict[2] = [1, 3]
-
-    assert(dict.keys() == graph.get_vertices())
-    print("Vertex set getter test passed!")
+    def __init__(self):
+        self.filename = "graph1k.txt"
+        self.running = True
+        self.graph = DoubleDictGraph.read_graph_from_text_file(self.filename)
 
 
-def test_is_edge():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(1, 2, 7)
-    assert(graph.is_edge(1, 2) == True)
-    assert(graph.is_edge(2, 3) == False)
-    print("Edge existence check test passed!")
+    def exit(self):
+        self.running = False
 
 
-def test_add_edge():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(4, 3, 15)
-    assert(graph.is_edge(4, 3) == True)
-    print("Edge addition test passed!")
+    def print_graph(self): 
+        for node in self.graph.get_vertices():
+            line = str(node) + ":"
+
+            for neighbour in self.graph.get_outbound_neighbours_of_vertex_X(node):
+                line += str(neighbour) + "  "
+
+            print(line)
 
 
-def test_get_outbound_neighbours():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 2, 5)
-    assert(graph.get_outbound_neighbours_of_vertex_X(0) == [2])
-    print("Outbound neighbours of a node test passed!")
+    def print_menu(self):
+        print("""		
+        1. get the number of vertices;
+        2. parse (iterate) the set of vertices;
+        3. given two vertices, find out whether there is an edge from the first one to the second one, and retrieve the Edge_id if there is an edge (the latter is not required if an edge is represented simply as a pair of vertex identifiers);
+        4. get the in degree and the out degree of a specified vertex;
+        5. parse (iterate) the set of outbound edges of a specified vertex (that is, provide an iterator). For each outbound edge, the iterator shall provide the Edge_id of the curren edge (or the target vertex, if no Edge_id is used).
+        6. parse the set of inbound edges of a specified vertex (as above);
+        7. retrieve or modify the information (the integer) attached to a specified edge.
+        8. The graph shall be modifiable: it shall be possible to add and remove an edge, and to add and remove a vertex. Think about what should happen with the properties of existing edges and with the identification of remaining vertices. You may use an abstract Vertex_id instead of an int in order to identify vertices; in this case, provide a way of iterating the vertices of the graph.
+        9. Read the graph from a text file (as an external function); see the format below.
+        10. Write the graph to a text file (as an external function); see the format below.
+        11.Create a random graph with specified number of vertices and of edges (as an external function). 
+        0. Exit the program
+        """)
 
 
-def test_get_inbound_neighbours():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 2, 5)
-    assert(graph.get_inbound_neighbours_of_vertex_X(2) == [0])
-    print("Outbound neighbours of a node test passed!")
+    def clear_screen(self):
+        print("\n"*100)
 
 
-def test_get_number_of_vertices():
-    graph = DoubleDictGraph(30)
-    assert(graph.get_number_of_vertices() == 30)
-    print("Number of vertices getter test passed!")
+    def num_of_vertices(self):
+        print("There are ", self.graph.get_number_of_vertices(), " vertices in the graph.") 
 
 
-def test_get_in_and_out_degree():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 0, 1)
-    graph.add_edge(0, 1, 7)
-    graph.add_edge(1, 2, 2)
-    graph.add_edge(2, 1, -1)
-    graph.add_edge(1, 3, 8)
-    graph.add_edge(2, 3, 5)
-    assert(graph.get_in_and_out_degree(1) == (2, 2))
-    print("In and out degree of a node test passed!")
+    def parse_set_of_vertices(self):
+        for vertex in self.graph.get_vertices():
+            print(vertex, end=" ")
 
 
-def test_parse_outbound_edges():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 0, 1)
-    graph.add_edge(0, 1, 7)
-    graph.add_edge(1, 2, 2)
-    graph.add_edge(2, 1, -1)
-    graph.add_edge(1, 3, 8)
-    graph.add_edge(2, 3, 5)
-    assert(graph.parse_outbound_edges_of_vertex_x(0) == [0, 1])
-    print("Outbound edges of a node parsing test passed!")
+    def is_edge_between_vertices(self):
+        vertex1 = int(input("Enter the first vertex: "))
+        vertex2 = int(input("Enter the second vertex: "))
+
+        if self.graph.is_edge(vertex1, vertex2):
+            print("There is an edge between {} and {} with the cost {}".format(vertex1, vertex2, self.graph.retrieve_edge_cost(vertex1, vertex2)))
+        else: 
+            print("There is no edge between {} and {}!\n".format(vertex1, vertex2))
 
 
-def test_parse_inbound_edges():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 0, 1)
-    graph.add_edge(0, 1, 7)
-    graph.add_edge(1, 2, 2)
-    graph.add_edge(2, 1, -1)
-    graph.add_edge(1, 3, 8)
-    graph.add_edge(2, 3, 5)
-    assert(graph.parse_inbound_edges_of_vertex_x(1) == [0, 2])
-    print("Inbound edges of a node parsing test passed!")
+    def in_degree_out_degree(self): 
+        vertex = int(input("Enter the vertex number:"))
+        degrees = self.graph.get_in_and_out_degree(vertex)
+        print("The in and out degree of the vertex are {}".format(str(degrees)))
 
 
-def test_retrieve_edge_cost():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 0, 1)
-    graph.add_edge(0, 1, 7)
-    graph.add_edge(1, 2, 2)
-    graph.add_edge(2, 1, -1)
-    graph.add_edge(1, 3, 8)
-    graph.add_edge(2, 3, 5)
-    assert(graph.retrieve_edge_cost(1, 3) == 8)
-    print("Edge cost retrieval test passed!")
+    def outbound_edges(self):
+        vertex = int(input("Specify the vertex: "))
+        for neighbour in self.graph.get_outbound_neighbours_of_vertex_X(vertex):
+            print(neighbour, " ")
+        print("\n")
 
 
-def test_modify_edge_cost():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 0, 1)
-    graph.add_edge(0, 1, 7)
-    graph.add_edge(1, 2, 2)
-    graph.add_edge(2, 1, -1)
-    graph.add_edge(1, 3, 8)
-    graph.add_edge(2, 3, 5)
-    graph.modify_edge_cost(1, 3, 18)
-    assert(graph.retrieve_edge_cost(1, 3) == 18)
-    print("Edge cost modification test passed!")
+    def inbound_edges(self):
+        vertex = int(input("Specify the vertex: "))
+        for neighbour in self.graph.get_inbound_neighbours_of_vertex_X(vertex):
+            print(neighbour, " ")
+        print("\n")
 
 
-def test_remove_edge():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 0, 1)
-    graph.add_edge(0, 1, 7)
-    graph.add_edge(1, 2, 2)
-    graph.add_edge(2, 1, -1)
-    graph.add_edge(1, 3, 8)
-    graph.add_edge(2, 3, 5)
-    assert(graph.is_edge(0, 1) == True)
+    def retrieve_modify(self):
+        first_vertex = int(input("Enter the first vertex of the edge: "))
+        second_vertex = int(input("Enter the second vertex of the edge: "))
 
-    graph.remove_edge(0, 1)
+        print("1. Retrieve cost of the edge")
+        print("2. Modify cost of the edge")
 
-    assert(graph.is_edge(0, 1) == False)
-    print("Edge removal test passed!")
+        option = int(input("Enter option: "))
 
-
-def test_add_vertex():
-    graph = DoubleDictGraph(1)
-    graph.add_vertex(156)
-
-    assert(graph.get_number_of_vertices() == 2)
-    print("Vertex addition test passed!")
+        if option == 1:
+            try:
+                print(self.graph.retrieve_edge_cost(first_vertex, second_vertex))
+            except KeyError as ke:
+                print("The edge {} does not exist!".format(ke))
+        else:
+            try:
+                new_cost = int(input("Enter the new cost of edge {}: ".format(str((first_vertex, second_vertex)))))
+                self.graph.modify_edge_cost(first_vertex, second_vertex, new_cost)
+            except KeyError as ke:
+                print("The edge {} does not exist!".format(ke))
 
 
-def test_remove_vertex():
-    graph = DoubleDictGraph(30)
-    graph.add_edge(0, 0, 1)
-    graph.add_edge(0, 1, 7)
-    graph.add_edge(1, 2, 2)
-    graph.add_edge(2, 1, -1)
-    graph.add_edge(1, 3, 8)
-    graph.add_edge(2, 3, 5)
+    def add_remove_vertex_edge(self):
+        self.clear_screen()
+        print("""
+               1. Add a new vertex
+               2. Remove a vertex
+               3. Add a new edge
+               4. Remove edge
+                """)
+        option = int(input("Enter an option:"))
+        if option == 1:
+            new_vertex = int(input("Enter the vertex number:"))
+            self.graph.add_vertex(new_vertex)
+        elif option == 2:
+            removed_vertex = int(input("Enter the vertex number to remove:"))
+            self.graph.remove_vertex(removed_vertex)
+        elif option == 3:
+            first_vertex = int(input("Enter the first vertex:"))
+            second_vertex = int(input("Enter the second vertex:"))
+            cost = int(input("Enter the cost:"))
 
-    graph.remove_vertex(1)
+            self.graph.add_edge(first_vertex, second_vertex, cost)
+        elif option == 4:
+            first_vertex = int(input("Enter the first vertex:"))
+            second_vertex = int(input("Enter the second vertex:"))
 
-    assert(graph.is_edge(0, 1) == False)
-    assert(graph.is_edge(2, 1) == False)
-    assert(graph.is_edge(1, 2) == False)
-    assert(graph.is_edge(1, 3) == False)
-
-    print("Vertex removal test passed!")
-
-
-def test_copy_graph():
-    graph = DoubleDictGraph(2)
-    graph.add_edge(0, 1, 0)
-
-    copy_of_the_graph = graph.copy()
-    copy_of_the_graph.remove_vertex(0)
-    copy_of_the_graph.remove_vertex(1)
-
-    assert(copy_of_the_graph.get_number_of_vertices() == 0)
-    assert(graph.get_number_of_vertices() == 2)
-
-    print("Graph copy test passed!")
+            self.graph.remove_edge(first_vertex, second_vertex)
 
 
-def main():
-    test_get_vertices()
-    test_is_edge()
-    test_add_edge()
-    test_get_outbound_neighbours()
-    test_get_inbound_neighbours()
-    test_get_number_of_vertices()
-    test_get_in_and_out_degree()
-    test_parse_outbound_edges()
-    test_parse_inbound_edges()
-    test_retrieve_edge_cost()
-    test_modify_edge_cost()
-    test_remove_edge()
-    test_add_vertex()
-    test_remove_vertex()
-    test_copy_graph()
+    def read_graph(self):
+        self.filename = input("Enter the input filename of the graph:")
+        self.graph = DoubleDictGraph.read_graph_from_text_file(self.filename) 
 
-main()
+
+    def write_graph(self):
+        filename = input("Enter the filename of the output file:")
+        self.graph.write_graph_to_text_file(filename)
+
+
+    def random_graph(self):
+        vertices = int(input("Enter the number of vertices:")) 
+        edges = int(input("Enter the number of edges:")) 
+
+        if edges > vertices * (vertices-1):
+            print("The number of edges should be max. n*(n-1), where n is the number of vertices. ")
+            return
+
+        self.graph = DoubleDictGraph.create_random_graph(vertices, edges) 
+
+
+    def main(self):
+        print("\n\n")
+       
+        options = [self.exit, self.num_of_vertices, self.parse_set_of_vertices, self.is_edge_between_vertices,
+                self.in_degree_out_degree, self.outbound_edges, self.inbound_edges, self.retrieve_modify, 
+                self.add_remove_vertex_edge, self.read_graph, self.write_graph, self.random_graph]
+
+        print("\n\n")
+        self.clear_screen()
+
+        while self.running:
+            self.print_menu()
+
+            try:
+                option = int(input("Enter an option: "))
+                self.clear_screen()
+                options[option]()
+            except ValueError as ve:
+                self.clear_screen()
+                print(ve)
+            except Exception as e:
+                print(e)
+
+menu = Menu()
+menu.main()
